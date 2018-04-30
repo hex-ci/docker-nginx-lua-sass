@@ -10,7 +10,7 @@ SASS version: 5.5.4
 
 To build the container run: `docker build -t your-name .`
 
-## Start
+## Run
 
 To start the container run: `docker run --name your-name -v /your/html/path:/usr/share/nginx/html -p your-port:80 -d codeigniter/nginx-lua-sass:3`
 
