@@ -12,4 +12,4 @@ To build the container run: `docker build -t your-name .`
 
 ## Usage
 
-`docker run --name your-name -v /your/html/path:/usr/share/nginx/html -p port:80 -d codeigniter/nginx-lua-sass:3`
+`docker run --name your-name -v /your/html/path:/usr/share/nginx/html -p your-port:80 -d codeigniter/nginx-lua-sass:3`
