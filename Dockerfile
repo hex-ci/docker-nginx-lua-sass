@@ -54,7 +54,7 @@ RUN addgroup -S nginx \
        --sbin-path=/usr/sbin/nginx \
        --modules-path=/usr/lib/nginx/modules \
        --conf-path=/etc/nginx/nginx.conf \
-       --error-log-path=/var/log/nginx/error.log \  
+       --error-log-path=/var/log/nginx/error.log \
        --http-log-path=/var/log/nginx/access.log \
        --pid-path=/var/run/nginx.pid \
        --lock-path=/var/run/nginx.lock \
@@ -139,6 +139,7 @@ RUN addgroup -S nginx \
 
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 COPY conf/nginx.vh.default.conf /etc/nginx/conf.d/default.conf
+COPY lua/ /usr/share/nginx/lua/
 
 EXPOSE 80 443
 
