@@ -14,7 +14,7 @@ To build the container run: `docker build -t your-name .`
 
 To start the container run: `docker run --name your-name -v /your/html/path:/usr/share/nginx/html -p your-port:80 -d codeigniter/nginx-lua-sass:3`
 
-Custom Nginx configurationn: `docker run --name your-name -v /your/html/path:/usr/share/nginx/html -v /your/path/default.conf:/etc/nginx/conf.d/default.conf -p your-port:80 -d codeigniter/nginx-lua-sass:3`
+Custom Nginx configuration: `docker run --name your-name -v /your/html/path:/usr/share/nginx/html -v /your/path/default.conf:/etc/nginx/conf.d/default.conf -p your-port:80 -d codeigniter/nginx-lua-sass:3`
 
 ## Usage
 
