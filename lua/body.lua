@@ -16,7 +16,6 @@ function compile(str)
 
   scss_obj.options.output_style = 1
   scss_obj.options.source_map_embed = true
-  scss_obj.options.source_comments = true
   scss_obj.options.source_map_contents = true
 
   scss_obj.options.is_indented_syntax_src = false
@@ -25,30 +24,29 @@ function compile(str)
 
   sass_obj.options.output_style = 1
   sass_obj.options.source_map_embed = true
-  sass_obj.options.source_comments = true
   sass_obj.options.source_map_contents = true
 
   sass_obj.options.is_indented_syntax_src = true
 
-  return ngx.re.gsub(str, [[<style\s+?type\s*?=\s*?"\s*?(.+?)\s*?"\s*?>([\s\S]+?)<\/style>]], function(match)
+  str = ngx.re.gsub(str, [[<style\s+?type\s*?=\s*?"\s*?(.+?)\s*?"\s*?>([\s\S]+?)<\/style>]], function(match)
+    local result, err
+
     if match[1] == 'text/scss' then
-      local result, err = scss_obj:compile_data(match[2])
-
-      if err then
-        return '<p>[SCSS] ' .. err .. '</p><script>console.error(`[SCSS] ' .. err .. '`)</script>'
-      else
-        return '<style type="text/css">\n' .. result .. '\n</style>'
-      end
+      result, err = scss_obj:compile_data(match[2])
     elseif match[2] == 'text/sass' then
-      local result, err = sass_obj:compile_data(match[2])
+      result, err = sass_obj:compile_data(match[2])
+    else
+      return match[0]
+    end
 
-      if err then
-        return '<p>[SASS] ' .. err .. '</p><script>console.error(`[SASS] ' .. err .. '`)</script>'
-      else
-        return '<style type="text/css">\n' .. result .. '\n</style>'
-      end
+    if err then
+      return '<p>[' .. match[1] .. '] ' .. err .. '</p><script>console.error(`[' .. match[1] .. '] ' .. err .. '`)</script>'
+    else
+      return '<style type="text/css">\n' .. result .. '\n</style>'
     end
   end, 'ijo')
+
+  return str
 end
 
 if ngx.re.match(ngx.header.content_type, [[^text/html]]) then
