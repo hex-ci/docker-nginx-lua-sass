@@ -49,7 +49,7 @@ function compile(str)
   return str
 end
 
-if ngx.re.find(ngx.header.content_type, [[^text/html]], 'ijo') then
+if ngx.re.find(ngx.header.content_type, [[^text/html(?:$|;.*$)]], 'ijo') then
 
   if ngx.arg[1] ~= '' then
     if ngx.ctx.body == nil then
