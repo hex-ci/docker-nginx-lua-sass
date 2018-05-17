@@ -10,12 +10,13 @@ function decode(str)
   return ret
 end
 
-function callback()
+function compile(str)
 
   local scss_obj = sass.new()
 
   scss_obj.options.output_style = 1
   scss_obj.options.source_map_embed = true
+  scss_obj.options.source_comments = true
   scss_obj.options.source_map_contents = true
 
   scss_obj.options.is_indented_syntax_src = false
@@ -24,55 +25,57 @@ function callback()
 
   sass_obj.options.output_style = 1
   sass_obj.options.source_map_embed = true
+  sass_obj.options.source_comments = true
   sass_obj.options.source_map_contents = true
 
   sass_obj.options.is_indented_syntax_src = true
 
+  return ngx.re.gsub(str, [[<style\s+?type\s*?=\s*?"\s*?(.+?)\s*?"\s*?>([\s\S]+?)<\/style>]], function(match)
+    if match[1] == 'text/scss' then
+      local result, err = scss_obj:compile_data(match[2])
 
-  local str = ngx.arg[1]
+      if err then
+        return '<p>[SCSS] ' .. err .. '</p><script>console.error(`[SCSS] ' .. err .. '`)</script>'
+      else
+        return '<style type="text/css">\n' .. result .. '\n</style>'
+      end
+    elseif match[2] == 'text/sass' then
+      local result, err = sass_obj:compile_data(match[2])
 
-  local str_style = string.gsub(str, '<style%s+type%s*=%s*"text/scss"%s*>([^<]+)</style>', function(text)
-    local result, err = scss_obj:compile_data(text)
-
-    if err then
-      return err
-    else
-      return '<style type="text/css">' .. result .. '\n</style>'
+      if err then
+        return '<p>[SASS] ' .. err .. '</p><script>console.error(`[SASS] ' .. err .. '`)</script>'
+      else
+        return '<style type="text/css">\n' .. result .. '\n</style>'
+      end
     end
-  end)
-
-  str_style = string.gsub(str_style, '<style%s+type%s*=%s*"text/sass"%s*>([^<]+)</style>', function(text)
-    local result, err = sass_obj:compile_data(text)
-
-    if err then
-      return err
-    else
-      return '<style type="text/css">' .. result .. '\n</style>'
-    end
-  end)
-
-  ngx.arg[1] = str_style
+  end, 'ijo')
 end
 
-if ngx.arg[1] ~= '' then
-  if ngx.ctx.body == nil then
-    ngx.ctx.body = ''
+if ngx.re.match(ngx.header.content_type, [[^text/html]]) then
+
+  if ngx.arg[1] ~= '' then
+    if ngx.ctx.body == nil then
+      ngx.ctx.body = ''
+    end
+
+    ngx.ctx.body = ngx.ctx.body .. ngx.arg[1]
   end
 
-  ngx.ctx.body = ngx.ctx.body .. ngx.arg[1]
-end
+  if ngx.arg[2] then
+    local body = ngx.ctx.body
+    local status, debody = pcall(decode, body)
 
-if ngx.arg[2] then
-  local body = ngx.ctx.body
-  local status, debody = pcall(decode, body)
+    if status then
+      debody = compile(debody)
 
-  if status then
-    ngx.arg[1] = debody
+      ngx.arg[1] = debody
+    else
+      body = compile(body)
+
+      ngx.arg[1] = body
+    end
+  else
+    ngx.arg[1] = nil
   end
 
-  callback()
-
-  return
-else
-  ngx.arg[1] = nil
 end
