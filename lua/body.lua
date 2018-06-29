@@ -32,9 +32,9 @@ function compile(str)
     local result, err
 
     if match[1] == 'text/scss' then
-      result, err = scss_obj:compile_data(match[2], ngx.var.request_filename)
+      result, err = scss_obj:compile_data(match[2], ngx.var.document_root)
     elseif match[2] == 'text/sass' then
-      result, err = sass_obj:compile_data(match[2], ngx.var.request_filename)
+      result, err = sass_obj:compile_data(match[2], ngx.var.document_root)
     else
       return match[0]
     end
