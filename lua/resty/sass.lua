@@ -84,7 +84,7 @@ function sass.compile_file(optionz, input_path, output_path)
     end
 end
 
-function sass.compile_data(options, input_string, output_path)
+function sass.compile_data(options, input_string, input_path)
     local data = data.new(input_string)
     local context = data.context
     local opts
@@ -97,6 +97,9 @@ function sass.compile_data(options, input_string, output_path)
     else
         opts = options.new()
     end
+    if input_path then
+        opts.input_path = input_path
+    end
     data.options = opts
     data:compile()
     if context.error_status ~= 0 then
@@ -104,18 +107,6 @@ function sass.compile_data(options, input_string, output_path)
     end
     local output = context.output_string
     if output then
-        if output_path then
-            local of, err = open(output_path, "w")
-            if not of then
-                return of, err
-            end
-            local ok, err = of:write(output)
-            if not ok then
-                of:close()
-                return ok, err
-            end
-            of:close()
-        end
         return output
     else
         return nil, "Unknown internal error."
