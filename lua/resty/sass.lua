@@ -84,7 +84,7 @@ function sass.compile_file(optionz, input_path, output_path)
     end
 end
 
-function sass.compile_data(options, input_string, input_path)
+function sass.compile_data(options, input_string, include_path)
     local data = data.new(input_string)
     local context = data.context
     local opts
@@ -97,8 +97,8 @@ function sass.compile_data(options, input_string, input_path)
     else
         opts = options.new()
     end
-    if input_path then
-        opts.input_path = input_path
+    if include_path then
+        opts.include_path = include_path
     end
     data.options = opts
     data:compile()
